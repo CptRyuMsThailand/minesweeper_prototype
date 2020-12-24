@@ -1,0 +1,12 @@
+Ratio of width :
+
+w is any positive integer number
+
+Hexagonal :
+ratio : h = 2 * (w / sqrt(3))
+
+Octal : 
+ratio : h = w
+
+Triangle : 
+ratio : h = w * 1.5

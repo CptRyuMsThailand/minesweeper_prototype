@@ -1,0 +1,422 @@
+<html>
+<head>
+	<title > Minesweeper </title>
+	<link rel="icon" href="./favicon.webp" type="image/x-icon" />
+
+</head>
+<style>
+:root{
+	--head-color : #666;
+	--btn-color : #444;
+	--slider-w : 100px;
+	
+}
+div.hover_content{
+	top : 0;
+	overflow: none;
+	z-index: 3;
+	position: fixed;
+	display: none;
+	
+	height:1%;
+	margin : 10%;
+	margin-top: 5%;
+	min-width: 320px;
+	
+}
+div.hover_content fieldset{
+	overflow: wrap;
+	
+	border:1px solid var(--head-color);
+	border-top-width: 2em;
+	border-radius: 20px;
+	background : #fff;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	
+}
+div.hover_content fieldset *{
+	margin-top: 10px;
+
+}
+div.hover_content fieldset button{
+	float : right;
+
+}
+
+#changeModeBTN{
+	
+	outline: none;
+	
+	background: white;
+	border-radius:2em;
+	margin-right: 25%;
+	
+	width : 50px;
+}
+canvas{
+	/*border:1px solid; */
+	
+	display: block;
+	margin-left:auto;
+	margin-right:auto;
+
+}
+div.topmenu{
+	position: fixed;
+	
+	width:100%;
+	z-index:2;
+	background: var(--head-color);
+	height:2.5em;
+	top:0;
+	color : #000;
+	font : 20px arial;
+	font-weight : bolder;
+}
+div.topmenu button{
+	background:var(--btn-color);
+	height:100%;
+	border:0px;
+	color : #fff;
+	width : 100px;
+	
+}
+div.topmenu button:hover{
+	background:#fff;
+	color : #000;
+	border:0px;
+}
+input.slider{
+	-webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  width: var(--slider-w); /* Full-width */
+  height: 15px; /* Specified height */
+  background: #d3d3d3; /* Grey background */
+  outline: none; /* Remove outline */
+  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+  transition: opacity .2s;
+  border-radius: 25px;
+}
+input.slider:hover{
+	opacity: 1;
+}
+.slider::-webkit-slider-thumb
+{
+	-webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 15px; /* Set a specific slider handle width */
+  height: 15px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+  border-radius : 50%;
+
+}
+.mmenu_button{
+	width:200px;
+	height:60px;
+	background:rgba(0,0,0,0);
+	color : #fff;
+	
+	border:0px;
+	font-size: 30px;
+}
+.mmenu_button:hover{
+	background:var(--btn-color);
+	
+	color:#000;
+
+}
+#maingame_mainmenu,#maingame_run{
+	background:url("mainmenuImage.jpg");
+	top:0;
+	left:0;
+	
+	height:100%;
+	position:sticky;
+    background-size:cover;
+    background-repeat:no-repeat;
+    background-position:center;
+    
+    
+	}
+
+#maingame_run{
+    min-height:600px;
+    padding-bottom:2.5em;
+    padding-top: 4.5em;
+    
+}
+#maingame_mainmenu table{
+	border-collapse: collapse;
+	height:100%;
+}
+#gamecontextmenu{
+	position: fixed;
+	margin : -1em;
+	
+	z-index:2;
+	background: rgba(0,0,0,0);
+	
+	top:0;
+	color : #fff;
+	font : 20px arial;
+	font-weight : bolder;
+	display:none;
+
+}
+#gamecontextmenu button{
+	width : 100px;
+	height : 40px;
+
+}
+</style>
+<body>
+	<div class="hover_content" >
+		<fieldset><legend style="overflow:visible;">
+			<span> New Game </span>
+			
+		</legend>
+		<label>
+			<select id="dom_select_grid">
+				<option value="0"> Triangle </option>
+				<option value="1" selected> Rectangle </option>
+				<option value="2"> Hexagonal </option>
+				<option value="3"> Octagonal </option>
+			</select>
+			Grid Mode
+			<br>
+			<select id="dom_select_diff" onchange ="dom_fs_custom.style.display=(this.value=='3')?'block':'none'">
+				<option value="0"> Beginner </option>
+				<option value="1"> Intermediate </option>
+				<option value="2"> Expert </option>
+				<option value="3"> Custom </option>
+			</select>
+			Difficulty
+			<br>
+			<fieldset style="display:none;" id="dom_fs_custom">
+				<legend > Parameters </legend>
+				<label>
+					<input type="range"
+					id="dom_width_range"
+					class="slider" 
+					min="9" max="30" value="9"
+
+					oninput="bomb_slider_update(); this.parentNode.getElementsByClassName('cf')[0].innerText=this.value;"> 
+					<span class="cf">9</span> &nbsp; Width </label><br>
+				<label>
+				<input type="range"
+					id="dom_height_range"
+					class="slider" 
+					min="9" max="24" value="9"
+					oninput="bomb_slider_update(); this.parentNode.getElementsByClassName('cf')[0].innerText=this.value;"> 
+					<span class="cf">9</span> &nbsp; Height </label><br>
+				<label>
+				<input type="range"
+					id="dom_bomb_range"
+					class="slider" 
+					min="10" max="667" value="10"
+					oninput="bomb_slider_update(); this.parentNode.getElementsByClassName('cf')[0].innerText=this.value;"> 
+					<span class="cf">10</span> &nbsp; Bomb </label><br>
+			</fieldset>
+			</label>
+			<hr>
+			<button onclick="menu_close_all()">Close</button>
+			<button onclick="menu_close_all(); gameInit();"> New Game </button>
+
+		</fieldset>
+	</div>
+
+
+	<div class="hover_content">
+		<fieldset><legend style="overflow:visible;">
+			<span> Credits </span>
+			
+		</legend>
+			
+			<p> Hello worlds</p>
+			<hr>
+			<button onclick="menu_close_all()">Close</button>
+		</fieldset>
+	</div>
+
+	<div class="hover_content">
+		<fieldset>
+			<p> Game Over</p>
+			<hr>
+			<button onclick="show_menu(0)"> New Game </button>
+		</fieldset>
+	</div>
+	<div class="hover_content">
+		<fieldset>
+			<p> Finished </p>
+			<hr>
+			<button onclick="show_menu(0)"> New Game </button>
+		</fieldset>
+	</div>
+	<div class="hover_content">
+		<fieldset>
+			<p> Exit to main Menu</p>
+			<hr>
+			<button onclick="menu_close_all()"> No </button>
+			<button onclick="menu_close_all(); showMainMenu();"> Yes </button>
+		</fieldset>
+	</div>
+	<div id="gamecontextmenu" class="hover_content">
+		<button onclick="handlerFlag(false,0); menu_close_all();"> &#128163; </button><br>
+		<button onclick="handlerFlag(false,1); menu_close_all();"> &#128681; </button><br>
+		
+
+	</div>
+	
+<div id="maingame_run" width="100%" onclick="gamecontextmenu.style.display='none';"
+oncontextmenu="
+event.preventDefault();
+game_context(this,event);"
+>
+<div class="topmenu">
+<button onclick="show_menu(0);"> New Game </button>
+<button onclick="show_menu(1);"> Credits </button>
+<button onclick="show_menu(4);"> Exit </button>
+
+<button id="changeModeBTN" onclick="handlerFlag();"> &#128163; </button>
+<span id="ppp">Flag Count <span id="pp">
+</span></span>
+</div>
+<div style="width:100%;  align-items: center;">
+
+            
+<canvas id="cv" width="800" height="600" onclick="click_ev(event);"></canvas>
+            
+  </div>
+
+
+</div>
+<div id="maingame_mainmenu" width="100%">
+	<table width="100%" >
+		<tr>
+			<th style="background:rgba(0,0,0,0.5);">
+				<h1 style="margin-bottom:100px; color:#fff;  font-family: monospace; font-size:70px;">Minesweeper</h1>
+				<button class="mmenu_button" onclick="show_menu(0)"> New Game </button><br>
+				<button class="mmenu_button" onclick="show_menu(1)"> Credits </button><br>
+				
+			</th>
+			<td width="10%" style="background : linear-gradient(90deg,rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.5) 75%, rgba(0,0,0,0.0) 100%);
+			"></td>
+			<td width="50%" style="background:rgba(0,0,0,0.0)"> </td>
+		</tr>
+	</table>
+</div>
+
+</body>
+<script src="trianglegrid.js"></script>
+<script src="hexgrid.js"></script>
+<script src="rectanglegrid.js"></script>
+<script src="octalgrid.js"></script>
+<script src="rng.js"></script>
+<script src="minesweeper.js"></script>
+
+<script type="text/javascript">
+
+	let flagMode = 0;
+
+	let gridList = [TriGrid,RectGrid,HexGrid,OctalGrid];
+	let ctx = cv.getContext("2d");
+	let W = cv.width;
+	let H = cv.height;
+	let RNG;
+	let game_grid;
+	let main_game; 
+
+	window.onload = function(){
+	    maingame_run.style.display = 'none';
+		//show_menu(0);
+	}
+	function game_context(caller,ev){
+		let bound = caller.getBoundingClientRect();
+		let x = ev.pageX;// - Math.round(bound.left) - Math.round(window.pageXOffset);
+		let y = ev.pageY;// - Math.round(bound.top) - Math.round(window.pageYOffset);
+		gamecontextmenu.style.display = "block";
+
+		gamecontextmenu.style.left = x;
+		gamecontextmenu.style.top = y;
+		
+	}
+	function show_menu(index){
+		menu_close_all();
+		document.getElementsByClassName("hover_content")[index].style.display="block";
+	}
+	function menu_close_all(){
+		let elem = document.getElementsByClassName("hover_content");
+		for(let i=0,len=elem.length;i<len;i++){
+			elem[i].style.display = 'none';
+		}
+	}
+
+	function handlerFlag(toggle = true,mode){
+		if(toggle)flagMode ^=1;
+		else{
+			flagMode = mode;
+		}
+		document.getElementById("changeModeBTN").innerHTML= (flagMode?"&#128681;":"&#128163;");
+	}
+	function click_ev(ev){
+		if(!main_game || main_game.gameOver){
+			return ;
+		}
+		let bound = cv.getBoundingClientRect();
+		let x = ev.pageX - Math.round(bound.left) - Math.round(window.pageXOffset);
+		let y = ev.pageY - Math.round(bound.top) - Math.round(window.pageYOffset);
+
+
+
+		main_game.mouse_click(game_grid,x,y,flagMode);
+		main_game.render(ctx,game_grid,"pp");
+		if(main_game.gameOver){
+			show_menu([2,3][main_game.overType]);
+		}
+	}
+	function bomb_slider_update(){
+		let v1 = Number(dom_width_range.value);
+		let v2 = Number(dom_height_range.value);
+		let v3 = Number(dom_bomb_range.value);
+		let max_bomb = (v1-1)*(v2-1);
+		dom_bomb_range.value = Math.min(v3,max_bomb);
+		dom_bomb_range.max = max_bomb;
+	}
+	function showMainMenu(){
+		main_game = {};
+		maingame_mainmenu.style.display = "";
+		maingame_run.style.display = "none";
+	}
+	function gameInit(){
+		maingame_mainmenu.style.display = "none";
+		maingame_run.style.display = "";
+		
+		let gmode_value = Number(dom_select_grid.value);
+		RNG = new rngLCG(Math.floor(Math.random()*10000));
+		game_grid = new (gridList[gmode_value])(0,0,W,H);
+		main_game = new Minesweeper(W,H);
+		let gw = 0;
+		let gh = 0;
+		let gbomb = 0;
+		switch(Number(dom_select_diff.value)){
+			case 0 : gw = 9; gh = 9; gbomb = 10;break;
+			case 1 : gw =16; gh =16; gbomb = 40;break;
+			case 2 : gw =24; gh =24; gbomb = 99;break;
+			case 3:{
+				gw = Number(dom_width_range.value);
+				gh = Number(dom_height_range.value);
+				gbomb = Number(dom_bomb_range.value);
+				
+			};break;
+		}
+		main_game.init(game_grid,gw,gh,gbomb,RNG);
+
+		main_game.render(ctx,game_grid,"pp");
+	}
+	
+	
+
+</script>
+</html>

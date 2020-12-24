@@ -1,0 +1,110 @@
+<html>
+<body>
+<canvas id="cv" style="border:1px solid #000" width="800" height="600" onclick="clicking(event);"></canvas>
+</body>
+<script type="text/javascript" src="imgBase64.js"></script>
+<script type="text/javascript" src="minesweeperImg.js"></script>
+<script type="text/javascript" src="hexgrid.js"></script>
+<script type="text/javascript">
+	let ctx = cv.getContext("2d");
+	let W = cv.width;
+	let H = cv.height;
+	let uvBuffer = ctx.createImageData(W,H);
+	let texture = TileDrawing.getImageBuffer(imageTexture);
+	let mipmap = new MipMapping(texture,4);
+	let cvList = new CanvasList(4,W,H);
+	let GridW = 10;
+	let GridH = 10;
+
+	let grid = new HexGrid(GridW,GridH,W,H);
+	let gArr = new Uint8Array(GridW*GridH);
+	init();
+	redraw();
+	function clicking(ev){
+		let bound = cv.getBoundingClientRect();
+		let x = ev.pageX - Math.round(bound.left) - Math.round(window.pageXOffset);
+		let y = ev.pageY - Math.round(bound.top) - Math.round(window.pageYOffset);
+		let pair = grid.mouseAt(x-grid.DrawOffsetLeft,y-grid.DrawOffsetTop);
+		let tx = pair[0];
+		let ty = pair[1];
+		if(tx >= 0 && ty >= 0 && tx < GridW && ty < GridH){
+			gArr[tx+ty*GridW] ^= 1;
+			redraw();
+		}
+	}
+	function init(){
+
+
+		for(let gx=0;gx<GridW;gx++)
+		for(let gy=0;gy<GridH;gy++){
+			let cx = 0;
+			let cy = 0;
+			let g_arr = grid.get_grid(gx,gy);
+			for(let i=0;i<g_arr[0];i++){
+				cx += g_arr[2][i][0];
+				cy += g_arr[2][i][1];
+			}
+			cx /= g_arr[0];
+			cy /= g_arr[0];
+			cx = Math.round(cx);
+			cy = Math.round(cy);
+		
+			for(let i=0;i<g_arr[0];i++){
+				TileDrawing.drawUV(uvBuffer,cx,cy,
+					Math.round(g_arr[2][i][0]),
+					Math.round(g_arr[2][i][1]),
+					Math.round(g_arr[2][(i+1)%g_arr[0]][0]),
+					Math.round(g_arr[2][(i+1)%g_arr[0]][1]));
+			}
+
+		}
+		
+		TileDrawing.mapTextureToPixel(cvList.contextArray[2],uvBuffer,mipmap,8,1,64,64,0,0,W,H);
+		TileDrawing.mapTextureToPixel(cvList.contextArray[3],uvBuffer,mipmap,6,1,64,64,0,0,W,H);
+		
+	}
+	function redraw(){
+		cvList.contextArray[0].beginPath();
+		cvList.contextArray[1].beginPath();
+			
+		for(let gx=0;gx<GridW;gx++)
+		for(let gy=0;gy<GridH;gy++){
+			let v = gArr[gx+gy*GridW];
+			let g_arr = grid.get_grid(gx,gy);
+			cvList.contextArray[v].moveTo(Math.floor(g_arr[2][0][0]),Math.floor(g_arr[2][0][1]));
+			for(let i=1;i<g_arr[0];i++){
+				cvList.contextArray[v].lineTo(Math.floor(g_arr[2][i][0]),Math.floor(g_arr[2][i][1]));
+			}
+			cvList.contextArray[v].closePath();
+		}
+		for(let i=0;i<2;i++){
+			cvList.contextArray[i].clearRect(0,0,W,H);
+			cvList.contextArray[i].fillStyle = "#fff";
+			cvList.contextArray[i].fill();
+		}
+		cvList.masking(0,2);
+		cvList.masking(1,3);
+		ctx.clearRect(0,0,W,H);
+		ctx.drawImage(cvList.canvasArray[0],0,0);
+		ctx.drawImage(cvList.canvasArray[1],0,0);
+		
+	}
+	/*for(let i=0;i<3;i++){
+		ctx.putImageData(mipmap.bufferList[i],0,i*64*2);
+	}*/
+
+	/*let cx = Math.round(W / 2);
+		let cy = Math.round(H / 2);
+		for(let i=0;i<6;i++){
+			let x1 = Math.round(Math.cos(i/6*Math.PI*2)*200);
+			let y1 = Math.round(Math.sin(i/6*Math.PI*2)*200);
+			let x2 = Math.round(Math.cos((i+1)/6*Math.PI*2)*200);
+			let y2 = Math.round(Math.sin((i+1)/6*Math.PI*2)*200);
+			
+			TileDrawing.drawUV(uvBuffer,cx,cy,cx+x1,cy+y1,cx+x2,cy+y2);
+		}*/
+		
+		
+	
+</script>
+</html>
