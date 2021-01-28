@@ -17,8 +17,8 @@ div.hover_content{
 	z-index: 3;
 	position: fixed;
 	display: none;
+	width : 50%;
 	
-	height:1%;
 	margin : 10%;
 	margin-top: 5%;
 	min-width: 320px;
@@ -26,9 +26,9 @@ div.hover_content{
 }
 div.hover_content fieldset{
 	overflow: wrap;
-	
-	border:1px solid var(--head-color);
-	border-top-width: 2em;
+	height : 100%;
+	border:5px solid var(--head-color);
+	/*border-top-width: 2em;*/
 	border-radius: 20px;
 	background : #fff;
 	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
@@ -37,12 +37,27 @@ div.hover_content fieldset{
 div.hover_content fieldset *{
 	margin-top: 10px;
 
+
 }
 div.hover_content fieldset button{
 	float : right;
+	
+	background: var(--btn-color);
+	color : white;
+	font-size : 20px;
+}
+div.hover_content fieldset select{
+	
+	font-size : 20px;
 
 }
-
+div.hover_content fieldset legend{
+	font-size : 20px;
+	padding:20px;
+	color:#fff;
+	background: var(--head-color);
+	border-radius: 20px;
+}
 #changeModeBTN{
 	
 	outline: none;
@@ -52,6 +67,9 @@ div.hover_content fieldset button{
 	margin-right: 25%;
 	
 	width : 50px;
+}
+body{
+	font-family: arial;
 }
 canvas{
 	/*border:1px solid; */
@@ -127,16 +145,19 @@ input.slider:hover{
 	color:#000;
 
 }
+body{
+	background:url("mainmenuImage2.jpg");
+	    background-size:cover;
+    background-repeat:no-repeat;
+    background-position:center;
+}
 #maingame_mainmenu,#maingame_run{
-	background:url("mainmenuImage.png");
 	top:0;
 	left:0;
 	
 	height:100%;
 	position:sticky;
-    background-size:cover;
-    background-repeat:no-repeat;
-    background-position:center;
+
     
     
 	}
@@ -243,6 +264,7 @@ input.slider:hover{
 	<div class="hover_content">
 		<fieldset>
 			<p> Game Over</p>
+			<p class="timer"></p>
 			<hr>
 			<button onclick="show_menu(0)"> New Game </button>
 		</fieldset>
@@ -250,12 +272,14 @@ input.slider:hover{
 	<div class="hover_content">
 		<fieldset>
 			<p> Finished </p>
+			<p class="timer"></p>
 			<hr>
 			<button onclick="show_menu(0)"> New Game </button>
 		</fieldset>
 	</div>
 	<div class="hover_content">
 		<fieldset>
+			<legend> Confirmation? </legend>
 			<p> Exit to main Menu</p>
 			<hr>
 			<button onclick="menu_close_all()"> No </button>
@@ -269,7 +293,7 @@ input.slider:hover{
 
 	</div>
 	
-<div id="maingame_run" width="100%" onclick="gamecontextmenu.style.display='none';"
+<div id="maingame_run" width="100%" style="display:none;" onclick="gamecontextmenu.style.display='none';"
 oncontextmenu="
 event.preventDefault();
 game_context(this,event);"
@@ -292,11 +316,11 @@ game_context(this,event);"
 
 
 </div>
-<div id="maingame_mainmenu" width="100%">
+<div id="maingame_mainmenu" width="100%" >
 	<table width="100%" >
 		<tr>
 			<th style="background:rgba(0,0,0,0.5);">
-				<h1 style="margin-bottom:100px; color:#fff;  font-family: monospace; font-size:70px;">Minesweeper</h1>
+				<h1 style="margin-bottom:100px; color:#fff;  font-family: monospace; font-size:70px;"><img src="gameLogo.png" style="height:210px;"></h1>
 				<button class="mmenu_button" onclick="show_menu(0)"> New Game </button><br>
 				<button class="mmenu_button" onclick="show_menu(1)"> Credits </button><br>
 				
@@ -315,27 +339,36 @@ game_context(this,event);"
 <script src="octalgrid.js"></script>
 <script src="rng.js"></script>
 <script src="minesweeper.js"></script>
-
+<script src="timer.js"></script>
+<script src="spriteImage.js"></script>
 <script type="text/javascript">
 
 	let flagMode = 0;
 
 	let gridList = [TriGrid,RectGrid,HexGrid,OctalGrid];
+
 	let ctx = cv.getContext("2d");
 	let W = cv.width;
 	let H = cv.height;
 	let RNG;
 	let game_grid;
 	let main_game; 
+	let gameTimer = new Timer();
+
 
 	window.onload = function(){
-	    maingame_run.style.display = 'none';
+	    //maingame_run.style.display = 'none';
+	    //maingame_mainmenu.style.display = '';
 		//show_menu(0);
+		new Sprite("flag.png");
+		new Sprite("bomb.png");
+		new Pattern(ctx,"grass_2.jpg");
+		new Pattern(ctx,"dirt_1.jpg");
 	}
 	function game_context(caller,ev){
 		let bound = caller.getBoundingClientRect();
-		let x = ev.pageX;// - Math.round(bound.left) - Math.round(window.pageXOffset);
-		let y = ev.pageY;// - Math.round(bound.top) - Math.round(window.pageYOffset);
+		let x = ev.clientX - Math.round(bound.left) - Math.round(window.pageXOffset);
+		let y = ev.clientY - Math.round(bound.top) - Math.round(window.pageYOffset);
 		gamecontextmenu.style.display = "block";
 
 		gamecontextmenu.style.left = x;
@@ -370,10 +403,18 @@ game_context(this,event);"
 
 
 
-		main_game.mouse_click(game_grid,x,y,flagMode);
+		main_game.mouse_click(game_grid,x,y,flagMode,gameTimer);
 		main_game.render(ctx,game_grid,"pp");
+		if(!main_game.firstClick){
+			gameTimer.start();
+		}
 		if(main_game.gameOver){
+			gameTimer.end();
 			show_menu([2,3][main_game.overType]);
+			let docm = document.getElementsByClassName("hover_content")[[2,3][main_game.overType]];
+			let e1 = docm.getElementsByClassName("timer")[0];
+			e1.innerText = gameTimer.result().join(" : ");
+
 		}
 	}
 	function bomb_slider_update(){
@@ -389,14 +430,16 @@ game_context(this,event);"
 		maingame_mainmenu.style.display = "";
 		maingame_run.style.display = "none";
 	}
-	function gameInit(){
+	async function gameInit(){
 		maingame_mainmenu.style.display = "none";
 		maingame_run.style.display = "";
+
+		gameTimer.reset();
 		
 		let gmode_value = Number(dom_select_grid.value);
 		RNG = new rngLCG(Math.floor(Math.random()*10000));
 		game_grid = new (gridList[gmode_value])(0,0,W,H);
-		main_game = new Minesweeper(W,H);
+		main_game = new Minesweeper(ctx,W,H);
 		let gw = 0;
 		let gh = 0;
 		let gbomb = 0;
@@ -412,10 +455,19 @@ game_context(this,event);"
 			};break;
 		}
 		main_game.init(game_grid,gw,gh,gbomb,RNG);
-
+		while(!main_game.allImageLoaded()){
+			await wait16();	
+		}
 		main_game.render(ctx,game_grid,"pp");
+			
+		
 	}
-	
+	function wait16(){
+		return new Promise(r=>{
+			requestAnimationFrame(r);
+
+		});
+	}
 	
 
 </script>

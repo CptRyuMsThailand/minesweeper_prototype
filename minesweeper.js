@@ -1,5 +1,5 @@
 class Minesweeper{
-	constructor(sw,sh){
+	constructor(ctx,sw,sh){
 		this.gameOver = false;
 		this.overType = 0;
 		this.gameBoard = [];
@@ -11,6 +11,19 @@ class Minesweeper{
 		this.bombCount = 0;
 		this.firstClick = false;
 		this.rng ;
+
+		this.flagSprite = new Sprite("flag.png");
+		this.bombSprite = new Sprite("bomb.png");
+		this.foreground = new Pattern(ctx,"grass_2.jpg");
+		this.background = new Pattern(ctx,"dirt_1.jpg");
+
+
+	}
+	allImageLoaded(){
+		return this.flagSprite.loaded&&
+				this.bombSprite.loaded&&
+				this.foreground.loaded&&
+				this.background.loaded ;
 	}
 	init(gridInterface,gameWidth,gameHeight,bombCount,rng){
 		gameWidth = Math.max(9,gameWidth);
@@ -221,14 +234,20 @@ class Minesweeper{
 		return [nei[0],nei[1],bombCount];
 		
 	}
+	renderRectangle(){
+
+	}
 	render(ctx,gridInterface,elemText){
 
 		ctx.textAlign = "center";
 		ctx.textBaseline = "middle";
-		ctx.font = " "+gridInterface.textResolution()*0.5 + "px courier bolder";
+		ctx.strokeStyle = "rgba(0,0,0,0.5)";
+		ctx.font = " "+gridInterface.textResolution()*0.5 + "px arial";
 		let sizeOfIcon = gridInterface.textResolution()*0.5;
 		ctx.clearRect(0,0,this.screenWidth,this.screenHeight);
 		
+		let bufferOfSprite = [];
+
 		let x_min = Infinity,y_min = Infinity;
 		let x_max = -Infinity,y_max = -Infinity;
 		for(let y=this.gameHeight-1;y>=0;y--)
@@ -237,19 +256,34 @@ class Minesweeper{
 			let accY = 0;
 			let pp = gridInterface.get_pixel(x,y);
 			let polygon = gridInterface.get_grid(x,y,0.9);
+			let polygon1 = gridInterface.get_grid(x,y,1);
+			let basePolygon = new Path2D();
+
 			ctx.beginPath();
 			ctx.moveTo(accX = polygon[2][0][0],accY = polygon[2][0][1]);
+			basePolygon.moveTo(polygon1[2][0][0],polygon1[2][0][1]);
+			x_min = Math.min(x_min,polygon1[2][0][0]);
+			y_min = Math.min(y_min,polygon1[2][0][1]);
+			x_max = Math.max(x_max,polygon1[2][0][0]);
+			y_max = Math.max(y_max,polygon1[2][0][1]);
+			
 			for(let i=1;i<polygon[0];++i){
 				let tx = polygon[2][i][0];
 				let ty = polygon[2][i][1];
 				accX += tx;
 				accY += ty;
 				ctx.lineTo(tx,ty);
+				basePolygon.lineTo(polygon1[2][i][0],polygon1[2][i][1]);
+				x_min = Math.min(x_min,polygon1[2][i][0]);
+				y_min = Math.min(y_min,polygon1[2][i][1]);
+				x_max = Math.max(x_max,polygon1[2][i][0]);
+				y_max = Math.max(y_max,polygon1[2][i][1]);
 			}
 			accX /= polygon[0];
 			accY /= polygon[0];
 			
 			ctx.closePath();
+			basePolygon.closePath();
 
 			let arrIndex = x+y*this.gameWidth;
 			let currValue = this.gameBoard[arrIndex];
@@ -259,11 +293,19 @@ class Minesweeper{
 			if(revealValue ){
 				if((currValue & 1) == 0 )
 				{
-					ctx.fillStyle = "rgba(255,255,255,0.45)";
+					
+					ctx.fillStyle = "rgba(0,0,0,0.25)";
 					ctx.fill();
+					
 					let tileText = (currValue & 0xf0 )>>4;
 					if(tileText > 0){
-						this.drawNumber(ctx,tileText,accX,accY,sizeOfIcon);
+						bufferOfSprite.push({
+							type:"drawNumber",
+							params:[
+							tileText,accX,accY
+							]
+						});
+						//this.drawNumber(ctx,tileText,accX,accY,sizeOfIcon);
 						//ctx.fillStyle = numberColor(tileText);
 						//ctx.fillText(tileText,accX,accY);
 					}
@@ -273,14 +315,30 @@ class Minesweeper{
 				
 				
 			}else{
-				ctx.fillStyle = "#000";
+				ctx.fillStyle = this.background.patt;
+				ctx.fill(basePolygon);
+				ctx.fillStyle = this.foreground.patt;
 				ctx.fill();
+				ctx.stroke();
+				
 				if(currValue & 4){
-					this.drawFlag(ctx,accX,accY,sizeOfIcon);
+					bufferOfSprite.push({
+							type:"drawFlag",
+							params:[
+							accX,accY
+							]
+						});
+					//this.drawFlag(ctx,accX,accY,sizeOfIcon);
 					//ctx.fillStyle= "#0f0";
 					//ctx.fillText("F",accX,accY);
 				}else if(currValue & 8){
-					this.drawQuestion(ctx,accX,accY,sizeOfIcon);
+					bufferOfSprite.push({
+						type:"drawQuestion",
+						params:[
+							accX,accY
+							]
+					});
+					//this.drawQuestion(ctx,accX,accY,sizeOfIcon);
 					//ctx.fillStyle = "#ff0";
 					//ctx.fillText("?",accX,accY);
 				}
@@ -291,48 +349,100 @@ class Minesweeper{
 				let condReveal = (currValue & 2) != 0;
 				let condFlag = (currValue & 4) != 0;
 				if(condFlag && !condBomb && !condReveal){
-					ctx.fillStyle = "#000";
+				
+					ctx.fillStyle = this.background.patt;
 					ctx.fill();
+					
+					//ctx.fillStyle = "#000";
+					//ctx.fill();
+					//ctx.stroke();
+					
+					
+
+
 					//ctx.fillStyle = "#fff";
 					//ctx.fillText("X",accX,accY);
-					this.drawInvalidFlag(ctx,accX,accY,sizeOfIcon);
+					bufferOfSprite.push({
+						type:"drawInvalidFlag",
+						params:[
+							accX,accY
+							]
+					});
+					//this.drawInvalidFlag(ctx,accX,accY,sizeOfIcon);
 				}else if(condBomb && !condFlag){
 					if(condReveal){
 						ctx.fillStyle = "#f00";
 						ctx.fill();
+						ctx.stroke();
 					}
-					this.drawBomb(ctx,accX,accY,sizeOfIcon);
+					bufferOfSprite.push({
+						type:"drawBomb",
+						params:[
+							accX,accY
+							]
+					});
+					//this.drawBomb(ctx,accX,accY,sizeOfIcon);
 					//ctx.fillStyle = "#000";
 					//ctx.fillText("B",accX,accY);
 				}
 			}
 			
 
-			ctx.stroke();
+			//ctx.stroke();
 			
+		}
+
+		
+		
+		//ctx.drawImage(this.foreground.img,0,0,this.screenWidth,this.screenHeight);
+
+		
+
+
+		for(let i of bufferOfSprite){
+			this[i.type](ctx,...i.params,sizeOfIcon);
 		}
 		if(this.gameOver){
 				ctx.fillStyle = "rgba(128,128,128,0.2)";
-				ctx.fillRect(0,0,this.screenWidth,this.screenHeight);
+				ctx.fillRect(x_min,y_min,x_max-x_min,y_max-y_min);
 				
 			}
 		document.getElementById(elemText).innerText = this.flagAvail;
 	}
 	drawNumber(ctx,num,cx,cy,size){
-		ctx.fillStyle = this.numberColor(num);
+		
+		ctx.lineWidth = size/5;
+		ctx.strokeStyle = this.numberColor(num);
+		ctx.strokeText(num,cx,cy);
+		ctx.lineWidth = 1;
+		ctx.fillStyle = "#fff";
 		ctx.fillText(num,cx,cy);
+
 	}
 	drawFlag(ctx,cx,cy,size){
-		ctx.fillStyle = "#f00";
-		ctx.fillText("F",cx,cy);
+		ctx.shadowColor = "#fff";
+		ctx.shadowBlur = 2;
+		if(this.flagSprite.loaded){
+			ctx.drawImage(this.flagSprite.img,cx-size/2,cy-size/2,size,size);
+		}else{
+			ctx.fillStyle = "#f00";
+			ctx.fillText("F",cx,cy);	
+		}
+		ctx.shadowBlur = 0;//set to zero when not used shadow map
+		
 	}
 	drawQuestion(ctx,cx,cy,size){
 		ctx.fillStyle = "#ff0";
 		ctx.fillText("?",cx,cy);
 	}
 	drawBomb(ctx,cx,cy,size){
-		ctx.fillStyle = "#fff";
-		ctx.fillText("B",cx,cy);
+		if(this.bombSprite.loaded){
+			ctx.drawImage(this.bombSprite.img,cx-size,cy-size,size*2,size*2);
+		}else{
+			ctx.fillStyle = "#fff";
+			ctx.fillText("B",cx,cy);	
+		}
+		
 	}
 	drawInvalidFlag(ctx,cx,cy,size){
 		ctx.fillStyle = "#f00";
@@ -340,14 +450,14 @@ class Minesweeper{
 	}
 	numberColor(i){
 		switch(i){
-			case 1 : return "#00f";
-			case 2 : return "#080";
-			case 3 : return "#f00";
-			case 4 : return "#005";
-			case 5 : return "#500";
-			case 6 : return "#077";
-			case 8 : return "#999";
-			default : return "#000";
+			case 1 : return "#0000ff";
+			case 2 : return "#008800";
+			case 3 : return "#ff0000";
+			case 4 : return "#000055";
+			case 5 : return "#550000";
+			case 6 : return "#007777";
+			case 8 : return "#999999";
+			default : return "#000000";
 		}
 	}
 }
