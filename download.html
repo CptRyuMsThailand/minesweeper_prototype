@@ -1,106 +1,29 @@
 <html>
 <body>
-<a id="aaa" download="cptMinesweeper.zip"> Download</a>
+<a href="javascript:downloadCode()"> Click Here if it's doesn't download automatically...</a>
 
-<progress value="" max="" id="progress"></progress>
 </body>
-<script type="text/javascript" src="jszip.min.js"></script>
 <script type="text/javascript">
-let baseFileFolder = "minesweeper_prototype/";
-let baseURL = "https://minesweeperhost.000webhostapp.com/";
-let fileNameList = [
-"base64Image.html",
-"bomb.png",
-"dirt_0.jpg",
-"dirt_0.png",
-"dirt_1.jpg",
-"dirt_1.png",
-"download.html",
-"favicon.webp",
-"flag.png",
-"gameLogo.png",
-"grass_0.jpg",
-"grass_1.jpg",
-"grass_2.jpg",
-"grass_3.jpg",
-"hexgrid.js",
-"imgBase64.js",
-"index.html",
-"jszip.min.js",
-"mainmenuImage.jpg",
-"mainmenuImage.png",
-"mainmenuImage1.png",
-"mainmenuImage2.jpg",
-"mainmenuImage4.png",
-"mainmenuImage5.jpg",
-"mainmenuImage6.png",
-"mainmenuScreen.html",
-"minesweeper.html",
-"minesweeper.js",
-"minesweeperImg.bmp",
-"minesweeperImg.js",
-"minesweeperImg.txt",
-"minesweeperImg.xcf",
-"minesweeperImg1.png",
-"minesweeperImg1.txt",
-"octalgrid.js",
-"ratioDescription.txt",
-"rectanglegrid.js",
-"rectGrid.png",
-"rng.js",
-"specialRender.js",
-"spriteImage.js",
-"timer.js",
-"trianglegrid.js"
-];
-
-let fileLoaded = 0;
-
-
 window.onload = function(){
-	loadedFile();
+	downloadCode();
 }
-async function loadedFile(){
-	let zip = new JSZip();
-	let promiseCollection = [];
-	progress.total = fileNameList.length;
-	fileLoaded = 0;
-	for(let i in fileNameList){
-		promiseCollection[i] = openFile(baseURL+""+fileNameList[i],i);
+async function downloadCode(){
+	let wind = await window.open(
+	"https://github.com/CptRyuMsThailand/minesweeper_prototype/archive/main.zip"
+	,"_blank");
+	wind.onunload = function(){
+		window.close();
 	}
-	let arrOfResolve = await Promise.all(promiseCollection);
-	for(let i in fileNameList){
-		let fnow = fileNameList[i];
-		zip.file(baseFileFolder+fnow,arrOfResolve[i]);
-	}
-	let dataBlob = await zip.generateAsync({type:"blob",compression:"DEFLATE"});
-	aaa.href = URL.createObjectURL(dataBlob);
-	aaa.click();
-	
+	//wind.close();
+	waitforms(1000);
+	//window.close();
 }
+function waitforms(ms){
+	return new Promise(resolve=>{
+		setTimeout(resolve,ms);
 
-
-
-function openFile(fname,index){
-	return new Promise(function(resolve){
-
-		let xhr = new XMLHttpRequest();
-		xhr.responseType = "arraybuffer";
-		
-		xhr.onload = function(){
-			fileLoaded++;
-			progress.value = fileLoaded;
-			resolve(this.response);
-		}
-		xhr.open("GET",fname);
-		xhr.send();
-	}
-	);
+	})
 }
-
-
-	
-
 </script>
 
 </html>
