@@ -512,7 +512,7 @@ game_context(this,event);"
 		gameTimer.reset();
 		
 		let gmode_value = Number(dom_select_grid.value);
-		RNG = new rngLCG(Math.floor(Math.random()*10000));
+		RNG = new rngLCG(Math.floor(Math.random()*2**31));
 		game_grid = new (gridList[gmode_value])(0,0,W,H);
 		main_game = new Minesweeper(ctx,W,H);
 		let gw = 0;
