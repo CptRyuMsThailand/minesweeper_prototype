@@ -8,21 +8,17 @@ window.onload = function(){
 	downloadCode();
 }
 async function downloadCode(){
-	let wind = await window.open(
-	"https://github.com/CptRyuMsThailand/minesweeper_prototype/archive/main.zip"
-	,"_blank");
-	wind.onunload = function(){
-		window.close();
-	}
-	//wind.close();
-	waitforms(1000);
-	//window.close();
+	let apims = document.createElement("a");
+	apims.href = "https://github.com/CptRyuMsThailand/minesweeper_prototype/archive/main.zip";
+	
+	apims.click();
+	await waitforms(1000);
+	window.close();
 }
 function waitforms(ms){
-	return new Promise(resolve=>{
-		setTimeout(resolve,ms);
-
-	})
+	return new Promise(
+		r=>{setTimeout(r,ms);}
+		);
 }
 </script>
 
