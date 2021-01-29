@@ -70,6 +70,7 @@ div.hover_content fieldset legend{
 }
 body{
 	font-family: arial;
+	cursor : URL('flag.png');
 }
 canvas{
 	/*border:1px solid; */
@@ -78,6 +79,9 @@ canvas{
 	margin-left:auto;
 	margin-right:auto;
 
+}
+button,select{
+	cursor:pointer;
 }
 div.topmenu{
 	position: fixed;
@@ -197,7 +201,7 @@ body{
 </style>
 <body>
 	<img class="imgPreloader" src="flag.png">
-	<img class="imgPreloader" src="bomp.png">
+	<img class="imgPreloader" src="bomb.png">
 	<img class="imgPreloader" src="grass_2.jpg">
 	<img class="imgPreloader" src="dirt_1.jpg">
 
@@ -318,7 +322,7 @@ game_context(this,event);"
 <div style="width:100%;  align-items: center;">
 
             
-<canvas id="cv" width="800" height="600" onclick="click_ev(event);"></canvas>
+<canvas id="cv" width="800" height="600" onclick="click_ev(event);" onmouseenter="mouse_onenter();" onmouseleave="mouse_onleave();"></canvas>
             
   </div>
 
@@ -372,6 +376,17 @@ game_context(this,event);"
 		//show_menu(0);
 		
 	}
+	function mouse_onenter(){
+		if(main_game.allImageLoaded())
+			cv.style.cursor = (flagMode == 1)?"crosshair":"pointer";
+		else
+			cv.style.cursor = "default";
+	}
+	function mouse_onleave(){
+		if(main_game.allImageLoaded())
+			cv.style.cursor = "default";
+
+	}
 	function download_game(){
 		let link = document.createElement("a");
 		link.href = "https://github.com/CptRyuMsThailand/minesweeper_prototype/archive/main.zip";
@@ -386,6 +401,8 @@ game_context(this,event);"
 
 		gamecontextmenu.style.left = x;
 		gamecontextmenu.style.top = y;
+
+
 		
 	}
 	function show_menu(index){
@@ -468,11 +485,11 @@ game_context(this,event);"
 			};break;
 		}
 		main_game.init(game_grid,gw,gh,gbomb,RNG);
-		document.body.style.cursor = "wait";
+		//document.body.style.cursor = "wait";
 		while(!main_game.allImageLoaded()){
 			await wait16();	
 		}
-		document.body.style.cursor = "default";
+		//document.body.style.cursor = "default";
 		main_game.render(ctx,game_grid,"pp");
 			
 		
