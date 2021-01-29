@@ -293,8 +293,19 @@ img.imgIcon{
 			<span> Credits </span>
 			
 		</legend>
-			
-			<p> Hello worlds</p>
+			<ul style="list-style-type: none;">
+
+			<li><h2> Main Staff</h2></li>
+			<li>
+				<ul style="list-style-type: none;">
+
+					<li><h3> Programming  </h3></li>
+					<li><p> CptRyuMS </p></li>
+					<li><h3> Graphic & Graphic Advisor </h3></li>
+					<li><p> PREM40531</p></li>
+				</ul>
+			</li>
+			</ul>
 			<hr>
 			<button onclick="menu_close_all()">Close</button>
 		</fieldset>
@@ -332,7 +343,7 @@ img.imgIcon{
 
 	</div>
 	
-<div id="maingame_run" width="100%" style="display:none;" onclick="gamecontextmenu.style.display='none';"
+<div id="maingame_run" width="100%" style="display:none; margin-left: -8px;" onclick="gamecontextmenu.style.display='none';"
 oncontextmenu="
 event.preventDefault();
 game_context(this,event);"
@@ -356,9 +367,9 @@ game_context(this,event);"
 
 
 </div>
-<div id="maingame_mainmenu" width="100%" >
+<div id="maingame_mainmenu" width="100%" height="100%" style="margin-left:-8px; margin-top:-6px;" >
 	<table width="100%" >
-		<tr>
+		<tr >
 			<th style="background:rgba(0,0,0,0.5);">
 				<h1 style="margin-bottom:100px; color:#fff;  font-family: monospace; font-size:70px;"><img src="gameLogo.png" style="height:210px;"></h1>
 				<button class="mmenu_button" onclick="show_menu(0)"> New Game </button><br>
@@ -408,7 +419,7 @@ game_context(this,event);"
 	function download_game(){
 		let link = document.createElement("a");
 		link.href = "https://github.com/CptRyuMsThailand/minesweeper_prototype/archive/main.zip";
-		
+
 		link.download = "";
 		link.click();
 	}
