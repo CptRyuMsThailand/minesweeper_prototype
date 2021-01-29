@@ -485,11 +485,11 @@ game_context(this,event);"
 			};break;
 		}
 		main_game.init(game_grid,gw,gh,gbomb,RNG);
-		//document.body.style.cursor = "wait";
+		document.body.style.cursor = "wait";
 		while(!main_game.allImageLoaded()){
 			await wait16();	
 		}
-		//document.body.style.cursor = "default";
+		document.body.style.cursor = "default";
 		main_game.render(ctx,game_grid,"pp");
 			
 		
