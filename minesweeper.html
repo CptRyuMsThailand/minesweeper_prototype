@@ -45,6 +45,7 @@ div.hover_content fieldset button{
 	background: var(--btn-color);
 	color : white;
 	font-size : 20px;
+	min-width: 4em;
 }
 div.hover_content fieldset select{
 	
@@ -60,13 +61,8 @@ div.hover_content fieldset legend{
 }
 #changeModeBTN{
 	
-	outline: none;
-	
-	background: white;
-	border-radius:2em;
-	margin-right: 25%;
-	
-	width : 50px;
+	background: white;	margin-bottom: 0px;
+
 }
 body{
 	font-family: arial;
@@ -89,21 +85,33 @@ div.topmenu{
 	width:100%;
 	z-index:2;
 	background: var(--head-color);
-	height:2.5em;
+	height:3.5em;
 	top:0;
 	color : #000;
-	font : 20px arial;
-	font-weight : bolder;
+	display: inline-block;
 }
-div.topmenu button{
+div.topmenu div{
+	height:2.5em;
+	display:inline;
+}
+div.topmenu div span{
+	font-family: 20px arial;
+	font-weight : bolder;
+
+}
+#ppp{
+
+}
+div.topmenu div button{
 	background:var(--btn-color);
 	height:100%;
-	border:0px;
+	border: 0px;
 	color : #fff;
 	width : 100px;
+	font-size:16px;
 	
 }
-div.topmenu button:hover{
+div.topmenu div button:hover{
 	background:#fff;
 	color : #000;
 	border:0px;
@@ -197,6 +205,11 @@ body{
 }
 .imgPreloader{
 	display: none;
+}
+button img{
+	height:25px;
+	width:25px;
+	display: inline-block;
 }
 </style>
 <body>
@@ -299,8 +312,8 @@ body{
 		</fieldset>
 	</div>
 	<div id="gamecontextmenu" class="hover_content">
-		<button onclick="handlerFlag(false,0); menu_close_all();"> &#128163; </button><br>
-		<button onclick="handlerFlag(false,1); menu_close_all();"> &#128681; </button><br>
+		<button onclick="handlerFlag(false,0); menu_close_all();"> <img class="imgIcon" src="bomb.png"> </button><br>
+		<button onclick="handlerFlag(false,1); menu_close_all();"> <img class="imgIcon" src="flag.png"> </button><br>
 		
 
 	</div>
@@ -311,18 +324,23 @@ event.preventDefault();
 game_context(this,event);"
 >
 <div class="topmenu">
+<div style="background: var(--head-color);">
 <button onclick="show_menu(0);"> New Game </button>
 <button onclick="show_menu(1);"> Credits </button>
 <button onclick="show_menu(4);"> Exit </button>
+</div><div style="height:3.5em;">
+<button id="changeModeBTN" onclick="handlerFlag();"><img src="bomb.png" class="imgIcon">  </button>
+</div><div style="padding-left: 60px; text-align: center;" >
 
-<button id="changeModeBTN" onclick="handlerFlag();"> &#128163; </button>
 <span id="ppp">Flag Count <span id="pp">
 </span></span>
+
+</div>
 </div>
 <div style="width:100%;  align-items: center;">
 
             
-<canvas id="cv" width="800" height="600" onclick="click_ev(event);" onmouseenter="mouse_onenter();" onmouseleave="mouse_onleave();"></canvas>
+<canvas id="cv" width="800" height="600" onclick="click_ev(event);"></canvas>
             
   </div>
 
@@ -376,17 +394,7 @@ game_context(this,event);"
 		//show_menu(0);
 		
 	}
-	function mouse_onenter(){
-		if(main_game.allImageLoaded())
-			cv.style.cursor = (flagMode == 1)?"crosshair":"pointer";
-		else
-			cv.style.cursor = "default";
-	}
-	function mouse_onleave(){
-		if(main_game.allImageLoaded())
-			cv.style.cursor = "default";
-
-	}
+	
 	function download_game(){
 		let link = document.createElement("a");
 		link.href = "https://github.com/CptRyuMsThailand/minesweeper_prototype/archive/main.zip";
@@ -421,7 +429,11 @@ game_context(this,event);"
 		else{
 			flagMode = mode;
 		}
-		document.getElementById("changeModeBTN").innerHTML= (flagMode?"&#128681;":"&#128163;");
+		document.getElementById("changeModeBTN").innerHTML= 
+		(flagMode?
+			"<img src='flag.png' class='imgIcon'>"
+			:
+			"<img src='bomb.png' class='imgIcon'>");
 	}
 	function click_ev(ev){
 		if(!main_game || main_game.gameOver){
