@@ -423,7 +423,7 @@ class Minesweeper{
 		ctx.shadowColor = "#fff";
 		ctx.shadowBlur = 2;
 		if(this.flagSprite.loaded){
-			ctx.drawImage(this.flagSprite.img,cx-size/2,cy-size/2,size,size);
+			ctx.drawImage(this.flagSprite.img,cx-size*0.8,cy-size*0.8,size*0.8*2,size*0.8*2);
 		}else{
 			ctx.fillStyle = "#f00";
 			ctx.fillText("F",cx,cy);	
@@ -437,7 +437,7 @@ class Minesweeper{
 	}
 	drawBomb(ctx,cx,cy,size){
 		if(this.bombSprite.loaded){
-			ctx.drawImage(this.bombSprite.img,cx-size,cy-size,size*2,size*2);
+			ctx.drawImage(this.bombSprite.img,cx-size*0.8,cy-size*0.8,size*0.8*2,size*0.8*2);
 		}else{
 			ctx.fillStyle = "#fff";
 			ctx.fillText("B",cx,cy);	
