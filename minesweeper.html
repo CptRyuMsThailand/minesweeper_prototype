@@ -365,6 +365,7 @@ game_context(this,event);"
 	let gameTimer = new Timer();
 
 
+
 	window.onload = function(){
 	    //maingame_run.style.display = 'none';
 	    //maingame_mainmenu.style.display = '';
@@ -467,12 +468,17 @@ game_context(this,event);"
 			};break;
 		}
 		main_game.init(game_grid,gw,gh,gbomb,RNG);
+		document.body.style.cursor = "wait";
 		while(!main_game.allImageLoaded()){
 			await wait16();	
 		}
+		document.body.style.cursor = "default";
 		main_game.render(ctx,game_grid,"pp");
 			
 		
+	}
+	function drawLoadingScreen(){
+
 	}
 	function wait16(){
 		return new Promise(r=>{
