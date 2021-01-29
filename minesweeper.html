@@ -59,14 +59,10 @@ div.hover_content fieldset legend{
 	background: var(--head-color);
 	border-radius: 20px;
 }
-#changeModeBTN{
-	
-	background: white;	margin-bottom: 0px;
 
-}
 body{
 	font-family: arial;
-	cursor : URL('flag.png');
+	
 }
 canvas{
 	/*border:1px solid; */
@@ -74,6 +70,7 @@ canvas{
 	display: block;
 	margin-left:auto;
 	margin-right:auto;
+	cursor: pointer;
 
 }
 button,select{
@@ -81,37 +78,35 @@ button,select{
 }
 div.topmenu{
 	position: fixed;
-	
+	padding-bottom: 30px;
 	width:100%;
 	z-index:2;
 	background: var(--head-color);
-	height:3.5em;
+	height:2.5em;
 	top:0;
 	color : #000;
-	display: inline-block;
+	display: inline;
 }
-div.topmenu div{
-	height:2.5em;
-	display:inline;
-}
-div.topmenu div span{
-	font-family: 20px arial;
+
+div.topmenu span{
+	font-family: arial;
+	font-size: 20px;
 	font-weight : bolder;
 
 }
-#ppp{
 
-}
-div.topmenu div button{
+button.btnTopmenu{
 	background:var(--btn-color);
-	height:100%;
+	height:4.2em;
+	
 	border: 0px;
 	color : #fff;
 	width : 100px;
 	font-size:16px;
+
 	
 }
-div.topmenu div button:hover{
+button.btnTopmenu:hover{
 	background:#fff;
 	color : #000;
 	border:0px;
@@ -200,19 +195,38 @@ body{
 }
 #gamecontextmenu button{
 	width : 100px;
-	height : 40px;
+	height : 60px;
+
+}
+#changeModeBTN{
+	padding:30px;
+	width: 30px;
+	height: 32px;
+	margin-right: 20%;
+	margin-left: 2%;
+	border-radius: 20px;
+	background-color: #fff;
+	background-image : url('bomb.png');
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center;
+	
+
+	display: inline-block;
+	
 
 }
 .imgPreloader{
 	display: none;
 }
-button img{
-	height:25px;
-	width:25px;
-	display: inline-block;
+img.imgIcon{
+	height:50px;
+	width:50px;
+	display: inline;
 }
 </style>
 <body>
+	
 	<img class="imgPreloader" src="flag.png">
 	<img class="imgPreloader" src="bomb.png">
 	<img class="imgPreloader" src="grass_2.jpg">
@@ -324,18 +338,14 @@ event.preventDefault();
 game_context(this,event);"
 >
 <div class="topmenu">
-<div style="background: var(--head-color);">
-<button onclick="show_menu(0);"> New Game </button>
-<button onclick="show_menu(1);"> Credits </button>
-<button onclick="show_menu(4);"> Exit </button>
-</div><div style="height:3.5em;">
-<button id="changeModeBTN" onclick="handlerFlag();"><img src="bomb.png" class="imgIcon">  </button>
-</div><div style="padding-left: 60px; text-align: center;" >
+<button onclick="show_menu(0);" class="btnTopmenu"> New Game </button>
+<button onclick="show_menu(1);" class="btnTopmenu"> Credits </button>
+<button onclick="show_menu(4);" class="btnTopmenu"> Exit </button>
 
+<button id="changeModeBTN" onclick="handlerFlag();" class="btnTopmenu"> </button>
 <span id="ppp">Flag Count <span id="pp">
 </span></span>
 
-</div>
 </div>
 <div style="width:100%;  align-items: center;">
 
@@ -429,11 +439,9 @@ game_context(this,event);"
 		else{
 			flagMode = mode;
 		}
-		document.getElementById("changeModeBTN").innerHTML= 
-		(flagMode?
-			"<img src='flag.png' class='imgIcon'>"
-			:
-			"<img src='bomb.png' class='imgIcon'>");
+		document.getElementById("changeModeBTN").style.backgroundImage= 
+		flagMode?"url(flag.png)":"url(bomb.png)";
+		cv.style.cursor = flagMode?"crosshair":"pointer";
 	}
 	function click_ev(ev){
 		if(!main_game || main_game.gameOver){
