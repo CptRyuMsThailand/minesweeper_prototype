@@ -294,7 +294,7 @@ class Minesweeper{
 				if((currValue & 1) == 0 )
 				{
 					
-					ctx.fillStyle = "rgba(0,0,0,0.25)";
+					ctx.fillStyle = "rgba(0,0,0,0.75)";
 					ctx.fill();
 					
 					let tileText = (currValue & 0xf0 )>>4;
