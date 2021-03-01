@@ -368,11 +368,13 @@ game_context(this,event);"
 <button onclick="show_menu(4);" class="btnTopmenu"> Exit </button>
 
 <button id="changeModeBTN" onclick="handlerFlag();" class="btnTopmenu"> </button>
+<span id="timer_output_ttt">HHH</span>
 <span id="ppp">Flag Count <span id="pp">
-</span></span>
+</span ></span>
+
 
 </div>
-<div style="width:100%;  align-items: center;">
+<div style="width:100%; align-items: center;">
 
             
 <canvas id="cv" width="800" height="600" onclick="click_ev(event);"></canvas>
@@ -424,6 +426,7 @@ game_context(this,event);"
 
 
 	window.onload = function(){
+		Timer_Loop();
 	    //maingame_run.style.display = 'none';
 	    //maingame_mainmenu.style.display = '';
 		//show_menu(0);
@@ -540,6 +543,22 @@ game_context(this,event);"
 			
 		
 	}
+	
+	async function Timer_Loop(){
+		while(1){
+			
+			if(gameTimer.isTicked){
+				gameTimer.view();
+				let tttt = gameTimer.result();
+				timer_output_ttt.innerHTML = formatPadding(tttt[0].toString(),2,"0")+":"+
+				formatPadding(tttt[1].toString(),2,"0")+":"+
+				formatPadding(tttt[2].toString(),2,"0");
+			}else{
+				timer_output_ttt.innerHTML = "00:00:00";
+			}
+			await wait16();
+		}
+	}
 	function drawLoadingScreen(){
 
 	}
@@ -548,6 +567,14 @@ game_context(this,event);"
 			requestAnimationFrame(r);
 
 		});
+	}
+	function formatPadding(text,count,char){
+
+		let ttt = "";
+		for(let i=count - text.length  ; i > 0 ; i--){
+			ttt += char;
+		}
+		return ttt + text;
 	}
 	
 

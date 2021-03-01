@@ -10,6 +10,10 @@ class Timer{
 		this.timeStart = Date.now();
 	}
 	end(){
+		this.isTicked = false;
+		this.timeEnd = Date.now();
+	}
+	view(){
 		this.timeEnd = Date.now();
 	}
 	reset(){
