@@ -11,6 +11,7 @@ class Minesweeper{
 		this.bombCount = 0;
 		this.firstClick = false;
 		this.rng ;
+		this.clickCount = 0;
 
 		this.flagSprite = new Sprite("flag.png");
 		this.bombSprite = new Sprite("bomb.png");
@@ -39,6 +40,7 @@ class Minesweeper{
 		gridInterface.height = this.gameHeight = gameHeight;
 		gridInterface.width = this.gameWidth = gameWidth;
 		this.rng = rng;
+		this.clickCount = 0;
 		/*for(let i=0;i<bombCount;++i){
 			this.gameBoard[i] = 1;
 		}
@@ -129,6 +131,8 @@ class Minesweeper{
 				}
 				if(currValue[0] > 0 && currValue[2] == 0){
 					for(let i=0;i<currValue[0];++i)
+					if(!(currValue[1][i][0] < 0 || currValue[1][i][1] < 0 || currValue[1][i][0] >= this.gameWidth || currValue[1][i][1] >= this.gameHeight))
+					if((this.gameBoard[currValue[1][i][0] + currValue[1][i][1] * this.gameWidth] & 2) == 0)
 					stack.push(currValue[1][i]);
 				}
 				first = false;
@@ -141,6 +145,7 @@ class Minesweeper{
 			
 		}
 	}
+	// NNNNQFEB
 	flagTile(gi,sx,sy){
 		if(sx < 0 || sx >= this.gameWidth ||
 			sy < 0 || sy >= this.gameHeight){
@@ -151,7 +156,7 @@ class Minesweeper{
 			return 0;
 		}else{
 			if((tv & 4 )||(tv & 8)){
-				return 1;
+				return 1; 
 			}else if(this.flagAvail > 0){
 				this.flagAvail--;
 				this.gameBoard[sx+sy*this.gameWidth]|=4;
@@ -200,6 +205,7 @@ class Minesweeper{
 				return [0];
 			}else{
 				this.gameBoard[pos] |= 2;
+				this.clickCount++;
 			}
 		}else{
 			if(tv & 1){
@@ -234,9 +240,7 @@ class Minesweeper{
 		return [nei[0],nei[1],bombCount];
 		
 	}
-	renderRectangle(){
-
-	}
+	
 	render(ctx,gridInterface,elemText){
 
 		ctx.textAlign = "center";

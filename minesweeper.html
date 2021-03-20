@@ -409,6 +409,7 @@ game_context(this,event);"
 <script src="minesweeper.js"></script>
 <script src="timer.js"></script>
 <script src="spriteImage.js"></script>
+<script src="BV3.js"></script>
 <script type="text/javascript">
 
 	let flagMode = 0;
@@ -493,6 +494,9 @@ game_context(this,event);"
 			let docm = document.getElementsByClassName("hover_content")[[2,3][main_game.overType]];
 			let e1 = docm.getElementsByClassName("timer")[0];
 			e1.innerText = gameTimer.result().join(" : ");
+			let calcBV3 = BV3.calculateScore(game_grid,main_game);
+			e1.innerText += "\n Optimal click : " +calcBV3;
+			e1.innerText += "\n Your click : "+main_game.clickCount;
 
 		}
 	}
@@ -554,7 +558,7 @@ game_context(this,event);"
 				formatPadding(tttt[1].toString(),2,"0")+":"+
 				formatPadding(tttt[2].toString(),2,"0");
 			}else{
-				
+
 				let tttt = gameTimer.result();
 				timer_output_ttt.innerHTML = formatPadding(tttt[0].toString(),2,"0")+":"+
 				formatPadding(tttt[1].toString(),2,"0")+":"+

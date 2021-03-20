@@ -1,6 +1,7 @@
 class rngLCG{
 	constructor(seed=1){
 		this.seed = seed;
+		this.originSeed = seed;
 	}
 	discard(){
 		this.seed = (this.seed * 1664525 + 1013904223)%(2**32);
